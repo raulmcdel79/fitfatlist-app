@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FitFatList</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root { /* Tema Claro “Cotidiano” */
+        --bg: #FFFFFF; --surface: #FAFAFA; --ink: #111827; --ink-muted: #6B7280;
+        --brand: #0EA5A8; --brand-ink: #072A2B; --accent: #16A34A; --danger: #DC2626; --warn: #F59E0B;
+        --border: #E5E7EB; --pill: #E6FFFB;
+        --shadow-card: 0 4px 12px 0 rgba(0, 0, 0, 0.07);
+      }
+      html[data-theme="dark"] { /* Tema Oscuro “Noche Cálida” */
+        --bg: #121317; --surface: #1A1C22; --ink: #F3F4F6; --ink-muted: #9CA3AF;
+        --brand: #14B8A6; --brand-ink: #071B1B; --accent: #22C55E; --danger: #EF4444; --warn: #F59E0B;
+        --border: #2A2D35; --pill: #0B2C2B;
+        --shadow-card: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg);
+        color: var(--ink);
+        transition: background-color 0.2s, color 0.2s;
+      }
+      /* Tooltip Styles */
+      [data-tooltip] {
+        position: relative;
+      }
+      [data-tooltip]::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px);
+        background-color: var(--ink);
+        color: var(--bg);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s, transform 0.2s;
+        z-index: 100;
+      }
+      [data-tooltip]:hover::after,
+      [data-tooltip]:focus-visible::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-4px);
+      }
+      /* Specific override for tooltips inside the header to appear below */
+      header [data-tooltip]::after {
+        bottom: auto;
+        top: 100%;
+        transform: translateX(-50%) translateY(8px);
+      }
+      header [data-tooltip]:hover::after,
+      header [data-tooltip]:focus-visible::after {
+        transform: translateX(-50%) translateY(4px);
+      }
+      
+      /* Override for tooltips on the right edge */
+      [data-tooltip].tooltip-align-right::after {
+          left: auto;
+          right: 0;
+          transform: translateX(0) translateY(-8px);
+      }
+      [data-tooltip].tooltip-align-right:hover::after,
+      [data-tooltip].tooltip-align-right:focus-visible::after {
+          transform: translateX(0) translateY(-4px);
+      }
+
+      header [data-tooltip].tooltip-align-right::after {
+          transform: translateX(0) translateY(8px);
+      }
+      header [data-tooltip].tooltip-align-right:hover::after,
+      header [data-tooltip].tooltip-align-right:focus-visible::after {
+          transform: translateX(0) translateY(4px);
+      }
+    </style>
+    <script>
+      // Configurar Tailwind para usar CSS Variables
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              bg: 'var(--bg)',
+              surface: 'var(--surface)',
+              ink: 'var(--ink)',
+              'ink-muted': 'var(--ink-muted)',
+              brand: 'var(--brand)',
+              'brand-ink': 'var(--brand-ink)',
+              accent: 'var(--accent)',
+              danger: 'var(--danger)',
+              warn: 'var(--warn)',
+              border: 'var(--border)',
+              pill: 'var(--pill)',
+            },
+            borderRadius: {
+              'xl': '12px',
+              '2xl': '16px',
+            },
+            boxShadow: {
+              'card': 'var(--shadow-card)',
+            }
+          }
+        },
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.1.1/",
+    "react/": "https://esm.sh/react@^19.1.1/",
+    "react": "https://esm.sh/react@^19.1.1",
+    "@google/genai": "https://esm.sh/@google/genai@^1.15.0",
+    "types": "https://esm.sh/types@^0.1.1",
+    "firebase/app": "https://esm.sh/firebase@8.10.1/app",
+    "firebase/auth": "https://esm.sh/firebase@8.10.1/auth",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.1.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

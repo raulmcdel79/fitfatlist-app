@@ -1,0 +1,43 @@
+/* Evita scroll horizontal en móvil y mejora tarjetas */
+@media (max-width: 640px) {
+  .product-card-mobile-fix {
+    max-width: 100vw !important;
+    overflow-x: auto !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .product-category-mobile {
+    display: block !important;
+    font-size: 0.85rem;
+    color: #0ea5e9;
+    font-weight: 600;
+    margin-bottom: 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+    max-width: 95vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .product-card-mobile-fix h3,
+  .product-card-mobile-fix p,
+  .product-card-mobile-fix span,
+  .product-card-mobile-fix input,
+  .product-card-mobile-fix select {
+    max-width: 120px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .product-card-mobile-fix .flex-shrink-0 {
+    min-width: 40px;
+    max-width: 80px;
+  }
+}
+@media (min-width: 641px) {
+  .product-category-mobile {
+    display: none !important;
+  }
+}

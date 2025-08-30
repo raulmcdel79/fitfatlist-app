@@ -1,0 +1,9 @@
+{
+  "name": "FitFatList",
+  "description": "Una aplicación de lista de compras familiar inteligente con un catálogo personal, comparación de precios por tienda y actualizaciones automáticas desde recibos mediante OCR. Admite listas compartidas en tiempo real, un modo 'en tienda', presupuestos semanales y estadísticas de ahorro.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "requestFramePermissionsReasoning": "Permite que esta aplicación solicite acceso a: La aplicación podría no funcionar correctamente sin estos permisos."
+}
