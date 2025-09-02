@@ -1548,10 +1548,12 @@ const App: React.FC = () => {
         />
       )}
 
-      <OcrView
-        onUpload={() => {}}
-        onClose={() => {}}
-      />
+      {isOcrViewOpen && (
+        <OcrView
+          onUpload={handleTicketUpload}
+          onClose={handleCloseOcr}
+        />
+      )}
       
       {isStoreModalOpen && (
         <AddStoreModal 
