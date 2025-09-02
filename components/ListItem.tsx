@@ -1,3 +1,5 @@
+
+
 import React, { useMemo, useState, useRef, useEffect } from 'react';
 import type { ListItem, Product, Store, PriceRecord, UserMap } from '../types';
 import { ListItemStatus } from '../types';
@@ -80,7 +82,7 @@ const ListItemComponent: React.FC<ListItemComponentProps> = ({ item, product, on
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && togglePicked()}
         aria-label={`Marcar ${product.name} como ${isPicked ? 'pendiente' : 'comprado'}`}
       >
-        <h3 className={`font-semibold text-ink block sm:truncate text-xs sm:text-base ${isPicked ? 'line-through' : ''}`} style={{minHeight: '1.5em', wordBreak: 'break-word'}} title={product.name}>{product.name}</h3>
+        <h3 className={`font-semibold text-ink truncate ${isPicked ? 'line-through' : ''}`} title={product.name}>{product.name}</h3>
          {isPicked && pickedByUser ? (
             <p className="text-xs text-accent font-semibold">
                 ✓ Comprado por {pickedByUser.name}

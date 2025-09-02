@@ -30,7 +30,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, bestPrice, onAdd, on
         {/* MOBILE: Bloque superior con nombre grande y valoraciones a la derecha */}
         <div className="flex flex-col gap-1 sm:hidden">
           <div className="flex items-start justify-between w-full">
-            <h3 className="font-bold text-lg text-ink leading-tight text-left w-full break-words" title={product.name} style={{minHeight:'2.5rem'}}>{product.name}</h3>
+            <div className="flex flex-col w-full items-end">
+              <span className="text-xs text-ink-muted font-medium mb-0.5 text-right w-full" style={{display:'block'}}>{product.name}</span>
+              <h3 className="font-bold text-lg text-ink leading-tight text-right w-full break-words" title={product.name} style={{minHeight:'2.5rem'}}>{product.brand}</h3>
+            </div>
             <div className="flex flex-col items-end gap-1 ml-2">
               <HealthScoreDisplay product={product} />
               {bestPrice && <StarRatingDisplay quality={bestPrice.quality} size="sm" />}
@@ -48,9 +51,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, bestPrice, onAdd, on
             </div>
           )}
           <div className="flex-grow flex items-center gap-2 min-w-0">
-            <div className="flex-grow min-w-0 flex flex-col items-start">
-              <h3 className="font-semibold text-ink truncate text-left w-full" title={product.name} style={{maxWidth:'120px'}}>{product.name}</h3>
-              <p className="text-sm text-ink-muted truncate text-left w-full" title={[product.brand, product.size].filter(Boolean).join(' · ')} style={{maxWidth:'120px'}}>{[product.brand, product.size].filter(Boolean).join(' · ')}</p>
+            <div className="flex-grow min-w-0 flex flex-col items-end">
+              <span className="text-xs text-ink-muted font-medium mb-0.5 text-right w-full" style={{display:'block'}}>{product.name}</span>
+              <h3 className="font-semibold text-ink text-right w-full break-words" title={product.brand}>{product.brand}</h3>
+              <p className="text-sm text-ink-muted text-right w-full break-words" title={product.size}>{product.size}</p>
             </div>
             <div className="flex-shrink-0 flex items-center gap-1">
                 <HealthScoreDisplay product={product} />

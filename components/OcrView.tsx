@@ -2,7 +2,6 @@
 import React, { useRef, useState } from 'react';
 import { XIcon } from '../constants';
 
-
 interface OcrViewProps {
   onUpload: (imageBase64: string) => void;
   onClose: () => void;
@@ -12,6 +11,15 @@ const OcrView: React.FC<OcrViewProps> = ({ onUpload, onClose }) => {
   const [image, setImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleOpenFile = () => {
+    console.log('Botón escáner pulsado');
+    if (fileInputRef.current) {
+      console.log('Input file existe, disparando click');
+      fileInputRef.current.click();
+    } else {
+      alert('Input file NO existe');
+    }
+  };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
     if (file) {
@@ -24,29 +32,24 @@ const OcrView: React.FC<OcrViewProps> = ({ onUpload, onClose }) => {
       reader.readAsDataURL(file);
     }
   };
-
-  const handleOpenFile = () => {
-    fileInputRef.current?.click();
-  };
-
   const handleRemoveImage = () => {
     setImage(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] p-4">
+    <div style={{ background: '#fff', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
       <div className="w-full flex justify-end mb-2">
         <button onClick={onClose} className="p-2 rounded-full hover:bg-border" aria-label="Cerrar escáner"><XIcon className="h-6 w-6" /></button>
       </div>
-      <h2 className="text-lg font-bold mb-4">Escanear ticket o producto</h2>
+      <h2 className="text-2xl font-bold mb-4">Escanear ticket o producto</h2>
       {!image ? (
         <>
           <button
             onClick={handleOpenFile}
             className="px-4 py-2 bg-brand text-white rounded shadow hover:bg-brand/80 transition mb-4"
           >
-            Tomar foto o seleccionar imagen
+            Tomar foto o seleccionar imagen (debug)
           </button>
           <input
             ref={fileInputRef}
@@ -73,7 +76,6 @@ const OcrView: React.FC<OcrViewProps> = ({ onUpload, onClose }) => {
 };
 
 export default OcrView;
-
 export const TicketLineItem = ({
   line,
   onDelete,

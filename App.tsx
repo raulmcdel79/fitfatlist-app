@@ -18,7 +18,7 @@ import OcrView from './components/OcrView';
 import { PlusIcon, XIcon, colorClassMap, WarningIcon } from './constants';
 import { SECTION_IDS } from './components/constants';
 import ShoppingModeView from './components/ShoppingModeView';
-import { GoogleGenAI, Type } from "@google/genai";
+// Gemini client removed on frontend to comply with Google policies
 import AddStoreModal from './components/AddStoreModal';
 import VoiceCommandModal from './components/VoiceCommandModal';
 import DashboardView from './components/DashboardView';
@@ -26,8 +26,7 @@ import HelpModal from './components/HelpModal';
 import AuthView from './components/AuthView';
 import './components/MobileFixes.css';
 
-// Initialize Gemini AI Client
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
+// Gemini client removed on frontend (policy compliance). AI features disabled.
 
 // --- ID Generation Helper ---
 const generateId = (prefix: string): string => {
@@ -334,51 +333,51 @@ const App: React.FC = () => {
 
   // Define the expected JSON schema for the AI response
   const ticketResponseSchema = {
-    type: Type.OBJECT,
+    type: 'object',
     properties: {
         storeNameGuess: {
-            type: Type.STRING,
+            type: 'string',
             description: `The name of the store from the receipt. It MUST EXACTLY MATCH one of these: ${storeNamesForPrompt}. If not found, leave empty.`,
         },
         items: {
-            type: Type.ARRAY,
+            type: 'array',
             items: {
-                type: Type.OBJECT,
+                type: 'object',
                 properties: {
                     rawDescription: {
-                        type: Type.STRING,
+                        type: 'string',
                         description: "Full, unmodified description of the item from the receipt.",
                     },
                     productName: {
-                        type: Type.STRING,
+                        type: 'string',
                         description: "The core name of the product, cleaned of brands, weights, and quantities. E.g., for 'PATATA 5 KG', this is 'PATATA'. For 'PATATAS MONALISA', this is 'PATATAS MONALISA'. Normalized to uppercase.",
                     },
                     brandGuess: {
-                        type: Type.STRING,
+                        type: 'string',
                         description: "The brand of the item, if identifiable in rawDescription. Otherwise, leave empty.",
                     },
                     sizeGuess: {
-                        type: Type.STRING,
+                        type: 'string',
                         description: "The size or weight of the item if present in the rawDescription (e.g., '5 KG', '400G', '1L', '6 pack'). Otherwise, leave empty.",
                     },
                     quantity: {
-                        type: Type.NUMBER,
+                        type: 'number',
                         description: "Quantity of the item purchased. If not specified, assume 1.",
                     },
                     unitPrice: {
-                        type: Type.NUMBER,
+                        type: 'number',
                         description: "Price per single unit of the item. Calculate if necessary (totalPrice / quantity).",
                     },
                     totalPrice: {
-                        type: Type.NUMBER,
+                        type: 'number',
                         description: "Total price for the line item (quantity * unit price).",
                     },
                     categoryGuess: {
-                        type: Type.STRING,
+                        type: 'string',
                         description: `Suggested category for the item from this list: ${categoryNamesForPrompt}.`,
                     },
                     healthScoreGuess: {
-                        type: Type.NUMBER,
+                        type: 'number',
                         description: "A health score from 1 to 5. 1 is ultra-processed, 3 is a good processed food, 5 is fresh, raw food.",
                     }
                 },
@@ -390,42 +389,42 @@ const App: React.FC = () => {
   };
   
     const voiceCommandSchema = {
-      type: Type.OBJECT,
+      type: 'object',
       properties: {
         action: {
-          type: Type.STRING,
+          type: 'string',
           description: `The action to perform. Must be one of: '${Object.values(VoiceCommandAction).join("', '")}'.`,
         },
         productName: {
-          type: Type.STRING,
+          type: 'string',
           description: "The normalized name of the product (e.g., 'leche', 'tomate frito'). Can be empty for CLEAR_LIST.",
         },
         storeName: {
-            type: Type.STRING,
+            type: 'string',
             description: `The normalized name of the store from this list: ${storeNamesForPrompt}. E.g., 'mercadona'. Can be empty if not specified.`,
         },
         quantity: {
-          type: Type.NUMBER,
+          type: 'number',
           description: "The quantity of the product. Defaults to 1 if not specified.",
         },
         categoryName: {
-          type: Type.STRING,
+          type: 'string',
           description: `The category name for the new product when action is CREATE_PRODUCT, guessed from this list: ${categoryNamesForPrompt}. Can be empty.`
         },
         brand: {
-            type: Type.STRING,
+            type: 'string',
             description: "The brand of the product, only for CREATE_PRODUCT action.",
         },
         price: {
-            type: Type.NUMBER,
+            type: 'number',
             description: "The price of the product, for CREATE_PRODUCT or UPDATE_PRICE actions.",
         },
-        unit: {
-            type: Type.STRING,
+    unit: {
+      type: 'string',
             description: `The unit of the product ('kg', 'l', 'u'), only for CREATE_PRODUCT action. Inferred from context (e.g., 'gramos' implies 'kg').`,
         },
-        size: {
-            type: Type.STRING,
+    size: {
+      type: 'string',
             description: `The size or weight of the product (e.g., '400g', '1L', '6 pack'), only for CREATE_PRODUCT action.`,
         },
       },
@@ -776,56 +775,22 @@ const App: React.FC = () => {
     await new Promise(resolve => setTimeout(resolve, 500));
     setActiveTicket(prev => prev ? { ...prev, status: TicketStatus.PARSING } : null);
 
-    try {
-        const imagePart = {
-            inlineData: {
-                data: imageBase64.split(',')[1],
-                mimeType: 'image/jpeg',
-            },
+  try {
+        // AI disabled: return a stub ticket with the image captured but no parsed lines
+        const ticketId = generateId('ticket');
+        const finalTicket: Ticket = {
+          id: ticketId,
+          storeId: stores[0]?.id || '',
+          status: TicketStatus.REVIEW,
+          lines: [],
+          createdAt: new Date().toISOString(),
         };
-
-        const textPart = {
-            text: `You are an expert OCR system for grocery receipts from Spanish supermarkets. Your task is to extract all line items and identify the store. Analyze this receipt and return a single JSON object.
-The object must contain two keys: "storeNameGuess" and "items".
-1. storeNameGuess: Identify the store's name from the receipt. It MUST EXACTLY MATCH one of these names: ${storeNamesForPrompt}. If you cannot identify a store from the list, return an empty string.
-2. items: An array where each object represents a product with these fields:
-    - rawDescription: The full, unmodified description of the item as it appears on the receipt.
-    - productName: The core product name extracted from rawDescription. This MUST NOT include brands, weights, or volumes. For example, from 'PATATA 5 KG', the productName is 'PATATA'. From 'PATATAS MONALISA', the productName is 'PATATAS MONALISA' because 'MONALISA' is a variety. The name should be normalized to uppercase.
-    - brandGuess: The brand of the item, if identifiable in rawDescription. Otherwise, leave it empty.
-    - sizeGuess: The size, weight, or volume from the rawDescription (e.g., '5 KG', '400G', '1L', '6 pack'). If not present, leave it empty.
-    - quantity: The quantity purchased. Default is 1. Must be a number.
-    - unitPrice: The price per single unit. This is crucial. If "2 x 1.50 = 3.00" is shown, unitPrice is 1.50. Must be a number.
-    - totalPrice: The total price for the line item (quantity * unit price). Must be a number.
-    - categoryGuess: A suggested category from this list: ${categoryNamesForPrompt}.
-    - healthScoreGuess: A nutritional score from 1 (unhealthy) to 5 (healthy).
-Return ONLY a valid JSON object matching the provided schema.`
-        };
-
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: { parts: [textPart, imagePart] },
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: ticketResponseSchema,
-            },
-        });
-        
-        const parsedData = JSON.parse(response.text);
-
-        const storeNameLower = (parsedData.storeNameGuess || '').toLowerCase().trim();
-        const foundStore = stores.find(s => s.name.toLowerCase() === storeNameLower);
-        const guessedStoreId = foundStore ? foundStore.id : (stores[0]?.id || '');
-
+        setActiveTicket(finalTicket);
+        /*
+        // Previous AI parsing logic removed for policy compliance
         if (Array.isArray(parsedData.items)) {
-            const ticketId = generateId('ticket');
-            const ticketLines: TicketLine[] = parsedData.items.map((item: any, index: number) => {
-                
-        const findBestProductMatch = (
-          description: string,
-          suggestedCategoryName: string | undefined
-        ): string | undefined => {
-          if (!description || !suggestedCategoryName) return undefined;
-
+          const ticketId = generateId('ticket');
+          const ticketLines: TicketLine[] = parsedData.items.map((item: any, index: number) => {
           // Validar que la sugerencia de la IA sea una sección/categoría válida
           const targetCategoryId = categoryNameMap.get(suggestedCategoryName.toLowerCase());
           if (!targetCategoryId || !SECTION_IDS.includes(targetCategoryId)) return undefined;
@@ -893,24 +858,17 @@ Return ONLY a valid JSON object matching the provided schema.`
                 };
             });
              
-             const finalTicket: Ticket = {
-                id: ticketId,
-                storeId: guessedStoreId,
-                status: TicketStatus.REVIEW,
-                lines: ticketLines,
-                createdAt: new Date().toISOString(),
-             };
-             setActiveTicket(finalTicket);
+       const finalTicket: Ticket = { id: ticketId, storeId: guessedStoreId, status: TicketStatus.REVIEW, lines: ticketLines, createdAt: new Date().toISOString() };
+       setActiveTicket(finalTicket);
 
-        } else {
-            throw new Error("AI response was not in the expected format.");
-        }
-    } catch (error) {
-        console.error("Error processing ticket with Gemini:", error);
+     } else { throw new Error("AI response was not in the expected format."); }
+     */
+  } catch (error) {
+    console.error("Error processing ticket:", error);
         alert("Hubo un error al procesar el ticket. Por favor, inténtalo de nuevo.");
         handleCloseOcr();
     }
-  }, [categoryNamesForPrompt, products, categoryNameMap, stores, ticketResponseSchema]);
+  }, [products, categoryNameMap, stores]);
 
   const handleDeleteTicketLine = useCallback((lineId: string) => {
     setActiveTicket(prev => {
@@ -1321,24 +1279,20 @@ Return ONLY a valid JSON object matching the provided schema.`
 
         Normaliza todos los nombres a minúsculas y sin acentos. Devuelve solo el JSON que se ajuste al esquema proporcionado.`;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: voiceCommandSchema,
-            },
-        });
-        
-        const parsedCommand = JSON.parse(response.text);
-        executeVoiceCommand(parsedCommand);
+        // AI disabled: simple stub that tries to detect 'limpiar' -> CLEAR_LIST, otherwise error
+        const low = (transcript || '').toLowerCase();
+        if (low.includes('limpiar')) {
+          executeVoiceCommand({ action: 'CLEAR_LIST' } as any);
+        } else {
+          throw new Error('Procesamiento de voz deshabilitado temporalmente');
+        }
 
     } catch (error: any) {
         console.error("Error processing voice command:", error);
         const errorMessage = error.message || "No te he entendido. ¿Puedes repetirlo?";
         setVoiceFeedback(prev => ({ ...prev, status: 'error', message: errorMessage }));
     }
-}, [storeNamesForPrompt, categoryNamesForPrompt, voiceCommandSchema, executeVoiceCommand]);
+}, [executeVoiceCommand]);
 
 
   const handleStartVoiceCommand = useCallback(() => {
@@ -1552,7 +1506,7 @@ Return ONLY a valid JSON object matching the provided schema.`
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+  <div className="min-h-screen flex flex-col">
       <Header 
         onScanTicket={handleOpenOcr} 
         onStartVoiceCommand={handleStartVoiceCommand} 
@@ -1594,27 +1548,10 @@ Return ONLY a valid JSON object matching the provided schema.`
         />
       )}
 
-      {isOcrViewOpen && (
-        <OcrView
-            stores={stores}
-            categories={categories}
-            activeTicket={activeTicket}
-            onUpload={handleTicketUpload}
-            onDeleteLine={handleDeleteTicketLine}
-            onUpdateLineCategory={handleUpdateTicketLineCategory}
-            onUpdateLineProductName={handleUpdateTicketLineProductName}
-            onUpdateLineBrand={handleUpdateTicketLineBrand}
-            onUpdateLineSize={handleUpdateTicketLineSize}
-            onUpdateLineQuality={handleUpdateTicketLineQuality}
-            onUpdateLineHealthScore={handleUpdateTicketLineHealthScore}
-            onUpdateTicketStore={handleUpdateTicketStore}
-            onAddCategory={handleAddCategory}
-            onApply={handleApplyTicket}
-            onClose={handleCloseOcr}
-            productMap={productMap}
-            priceRecords={priceRecords}
-        />
-      )}
+      <OcrView
+        onUpload={() => {}}
+        onClose={() => {}}
+      />
       
       {isStoreModalOpen && (
         <AddStoreModal 
